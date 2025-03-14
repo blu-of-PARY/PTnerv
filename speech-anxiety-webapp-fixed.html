@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>발표 불안 자가진단 테스트</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            line-height: 1.6;
+            color: #1d1d1d;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #efefef;
+        }
+        h1, h2, h3 {
+            color: #1d1d1d;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #1d1d1d;
+        }
+        .intro {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+        .section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .question:last-child {
+            border-bottom: none;
+        }
+        .scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .scale label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .scale input[type="radio"] {
+            margin-bottom: 5px;
+        }
+        .open-question textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 80px;
+            resize: vertical;
+        }
+        button {
+            background-color: #febe00;
+            color: #1d1d1d;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            transition: background-color 0.3s;
+            font-weight: 600;
+        }
+        button:hover {
+            background-color: #e6ab00;
+        }
+        #results {
+            display: none;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+        .result-section {
+            margin-bottom: 20px;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 10px 0;
+            height: 20px;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 5px;
+            background-color: #febe00;
+            text-align: center;
+            line-height: 20px;
+            color: #1d1d1d;
+            font-size: 12px;
+            font-weight: bold;
+            transition: width 0.5s;
+        }
+        .recommendation {
+            background-color: #fff9e6;
+            padding: 15px;
+            border-left: 4px solid #febe00;
+            margin: 15px 0;
+        }
+        .legend {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+        }
+        .radio-label {
+            font-size: 14px;
+            text-align: center;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .nav-buttons button {
+            margin: 0;
+        }
+        .nav-buttons button.prev {
+            background-color: #f0f0f0;
+            color: #1d1d1d;
+        }
+        .nav-buttons button.next {
+            background-color: #febe00;
+        }
+        #page-indicator {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #ddd;
+            border-radius: 50%;
+            margin: 0 5px;
+        }
+        .indicator.active {
+            background-color: #febe00;
+        }
+        #retry-btn {
+            margin-top: 20px;
+        }
+        .error-text {
+            color: #ee1b24;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+        .question.error {
+            border-left: 3px solid #ee1b24;
+            padding-left: 15px;
+            background-color: #fff0f0;
+        }
+        .error-msg {
+            color: #ee1b24;
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+        @media (max-width: 600px) {
+            .scale {
+                flex-direction: row;
+            }
+            .scale label {
+                margin: 0 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="survey">
+        <h1>발표 불안 자가진단 테스트</h1>
+        
+        <div id="page-indicator">
+            <span class="indicator active" data-page="1"></span>
+            <span class="indicator" data-page="2"></span>
+            <span class="indicator" data-page="3"></span>
+            <span class="indicator" data-page="4"></span>
+            <span class="indicator" data-page="5"></span>
+        </div>
+
+        <p class="error-msg" id="error-message">모든 질문에 답변해 주세요.</p>
+
+        <form id="anxietyForm">
+            <div id="page1" class="page active">
+                <div class="intro">
+                    <p>이 테스트는 발표 상황에서 느끼는 불안감과 그 원인을 파악하는 데 도움을 주기 위해 개발되었습니다. 각 문항에 대해 본인이 느끼는 정도를 솔직하게 체크해주세요.</p>
+                    <p>약 5분이 소요되며, 제출 후 바로 결과를 확인할 수 있습니다.</p>
+                </div>
+
+                <div class="section">
+                    <div class="question">
+                        <label for="gender">성별:</label>
+                        <select id="gender" name="gender">
+                            <option value="">선택하세요</option>
+                            <option value="male">남성</option>
+                            <option value="female">여성</option>
+                            <option value="other">기타</option>
+                        </select>
+                    </div>
+                    <div class="question">
+                        <label for="age">연령대:</label>
+                        <select id="age" name="age">
+                            <option value="">선택하세요</option>
+                            <option value="10s">10대</option>
+                            <option value="20s">20대</option>
+                            <option value="30s">30대</option>
+                            <option value="40s">40대</option>
+                            <option value="50s">50대 이상</option>
+                        </select>
+                    </div>
+                    <div class="question">
+                        <label for="experience">발표 경험:</label>
+                        <select id="experience" name="experience">
+                            <option value="">선택하세요</option>
+                            <option value="none">거의 없음</option>
+                            <option value="few">가끔</option>
+                            <option value="some">종종</option>
+                            <option value="many">자주</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <div></div> <!-- 빈 공간으로 첫 페이지에는 이전 버튼 없음 -->
+                    <button type="button" class="next" data-goto="2">다음</button>
+                </div>
+            </div>
+            <div id="page2" class="page">
+                <div class="section">
+                    <div class="question" id="q1-container">
+                        <p>1. 발표할 내용을 잊어버릴까봐 걱정된다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q1" value="1">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q1" value="2">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q1" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q1" value="4">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q1" value="5">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q2-container">
+                        <p>2. 친구들과는 편하게 대화하지만 발표 상황에서는 말이 잘 안 나온다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q2" value="1">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q2" value="2">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q2" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q2" value="4">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q2" value="5">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q3-container">
+                        <p>3. 발표 전에 긴장되고 불안하다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q3" value="1">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q3" value="2">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q3" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q3" value="4">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q3" value="5">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q4-container">
+                        <p>4. 발표 중에 사람들의 얼굴이 흐릿하게 보이거나 초점이 잘 안 맞는다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q4" value="1">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q4" value="2">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q4" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q4" value="4">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q4" value="5">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="prev" data-goto="1">이전</button>
+                    <button type="button" class="next" data-goto="3">다음</button>
+                </div>
+            </div>
+            <div id="page3" class="page">
+                <div class="section">
+                    <div class="question" id="q5-container">
+                        <p>5. 발표가 끝난 후에 후회와 자책감이 든다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q5" value="1">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q5" value="2">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q5" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q5" value="4">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q5" value="5">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q6-container">
+                        <p>6. 발표 중에 생각이 혼란스럽고 정리가 잘 안 된다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q6" value="1">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q6" value="2">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q6" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q6" value="4">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q6" value="5">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q7-container">
+                        <p>7. 발표 중에 심장이 빠르게 뛰거나 손이 떨린다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q7" value="1">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q7" value="2">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q7" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q7" value="4">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q7" value="5">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q8-container">
+                        <p>8. 가능하다면 발표를 피하고 싶다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q8" value="1">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q8" value="2">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q8" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q8" value="4">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q8" value="5">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="prev" data-goto="2">이전</button>
+                    <button type="button" class="next" data-goto="4">다음</button>
+                </div>
+            </div>
+            <div id="page4" class="page">
+                <div class="section">
+                    <div class="question" id="q9-container">
+                        <p>9. 발표 중에 내가 얼마나 긴장해 보이는지 계속 신경 쓴다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q9" value="1">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q9" value="2">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q9" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q9" value="4">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q9" value="5">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q10-container">
+                        <p>10. 발표 중에 내 생각이나 감정에 지나치게 집중하게 된다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q10" value="1">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q10" value="2">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q10" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q10" value="4">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q10" value="5">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q11-container">
+                        <p>11. 발표 중에도 내 상태를 객관적으로 파악하고 유연하게 대처할 수 있다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q11" value="5">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q11" value="4">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q11" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q11" value="2">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q11" value="1">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q12-container">
+                        <p>12. 발표할 때 상황을 내가 통제하고 있다고 느낀다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q12" value="5">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q12" value="4">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q12" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q12" value="2">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q12" value="1">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="prev" data-goto="3">이전</button>
+                    <button type="button" class="next" data-goto="5">다음</button>
+                </div>
+            </div>
+            <div id="page5" class="page">
+                <div class="section">
+                    <div class="question" id="q13-container">
+                        <p>13. 발표 자체에서 만족감이나 성취감을 느낀다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q13" value="5">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q13" value="4">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q13" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q13" value="2">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q13" value="1">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q14-container">
+                        <p>14. 발표에서 무엇을 전달하고 싶은지 명확한 목표가 있다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q14" value="5">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q14" value="4">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q14" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q14" value="2">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q14" value="1">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q15-container">
+                        <p>15. 다른 사람들의 평가보다 발표 내용에 집중할 수 있다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q15" value="5">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q15" value="4">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q15" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q15" value="2">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q15" value="1">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q16-container">
+                        <p>16. 발표에서 실수를 하더라도 나 자신을 가치 있는 사람이라고 생각한다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q16" value="5">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q16" value="4">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q16" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q16" value="2">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q16" value="1">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                    
+                    <div class="question" id="q17-container">
+                        <p>17. 발표에 대한 부정적인 피드백을 받아도 내 자신에 대한 가치를 의심하지 않는다.</p>
+                        <div class="scale">
+                            <label>
+                                <input type="radio" name="q17" value="5">
+                                <span class="radio-label">전혀 아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q17" value="4">
+                                <span class="radio-label">아니다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q17" value="3">
+                                <span class="radio-label">보통이다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q17" value="2">
+                                <span class="radio-label">그렇다</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="q17" value="1">
+                                <span class="radio-label">매우 그렇다</span>
+                            </label>
+                        </div>
+                        <div class="error-text">이 질문에 답변해 주세요.</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="prev" data-goto="4">이전</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="results">
+        <h1>발표 불안 자가진단 결과</h1>
+        
+        <div class="result-section">
+            <h2>발표 불안 지수</h2>
+            <div class="progress-container">
+                <div id="anxiety-progress" class="progress-bar" style="width: 0%">0%</div>
+            </div>
+            <div class="legend">
+                <span>낮음</span>
+                <span>보통</span>
+                <span>높음</span>
+            </div>
+            <div id="anxiety-level"></div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 페이지 인디케이터 업데이트
+            function updatePageIndicator(pageNum) {
+                document.querySelectorAll('.indicator').forEach(ind => {
+                    ind.classList.remove('active');
+                });
+                document.querySelector(`.indicator[data-page="${pageNum}"]`).classList.add('active');
+            }
+        
+            // 페이지 전환
+            function showPage(pageNum) {
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                document.getElementById(`page${pageNum}`).classList.add('active');
+                updatePageIndicator(pageNum);
+            }
+        
+            // 현재 페이지의 모든 질문에 답변했는지 확인
+            function validateCurrentPage(pageNum) {
+                const currentPage = document.getElementById(`page${pageNum}`);
+                const questionContainers = currentPage.querySelectorAll('.question');
+                let isValid = true;
+                
+                // 에러 메시지 초기화
+                document.getElementById('error-message').style.display = 'none';
+                questionContainers.forEach(container => {
+                    container.classList.remove('error');
+                    const errorText = container.querySelector('.error-text');
+                    if (errorText) {
+                        errorText.style.display = 'none';
+                    }
+                });
+                
+                // 첫 페이지는 개인정보 입력이므로 검증 없이 통과
+                if (pageNum === 1) {
+                    return true;
+                }
+                
+                // 각 문항 검증
+                questionContainers.forEach(container => {
+                    const radioInputs = container.querySelectorAll('input[type="radio"]');
+                    if (radioInputs.length > 0) {
+                        const radioName = radioInputs[0].name;
+                        const checked = document.querySelector(`input[name="${radioName}"]:checked`);
+                        if (!checked) {
+                            container.classList.add('error');
+                            const errorText = container.querySelector('.error-text');
+                            if (errorText) {
+                                errorText.style.display = 'block';
+                            }
+                            isValid = false;
+                        }
+                    }
+                });
+                
+                if (!isValid) {
+                    document.getElementById('error-message').style.display = 'block';
+                    window.scrollTo(0, 0);
+                }
+                
+                return isValid;
+            }
+        
+            // 페이지 이동 버튼 이벤트
+            document.querySelectorAll('.nav-buttons button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetPage = parseInt(this.getAttribute('data-goto'));
+                    const currentPage = parseInt(document.querySelector('.page.active').id.replace('page', ''));
+                    
+                    // 다음 페이지로 이동할 때만 검증
+                    if (targetPage > currentPage) {
+                        if (!validateCurrentPage(currentPage)) {
+                            return;
+                        }
+                    }
+                    
+                    showPage(targetPage);
+                });
+            });
+        
+            // 결과 계산 및 표시
+            function calculateResults() {
+                // 발표 불안 점수 (1-8번 문항)
+                let anxietyScore = 0;
+                for (let i = 1; i <= 8; i++) {
+                    const radioChecked = document.querySelector(`input[name="q${i}"]:checked`);
+                    if (radioChecked) {
+                        const value = parseInt(radioChecked.value);
+                        anxietyScore += value;
+                    }
+                }
+                anxietyScore = (anxietyScore / 8) * 20; // 백분율로 변환 (100점 만점)
+                
+                // 자기 몰입 점수 (9-10번 문항)
+                let selfAbsorptionScore = 0;
+                for (let i = 9; i <= 10; i++) {
+                    const radioChecked = document.querySelector(`input[name="q${i}"]:checked`);
+                    if (radioChecked) {
+                        const value = parseInt(radioChecked.value);
+                        selfAbsorptionScore += value;
+                    }
+                }
+                selfAbsorptionScore = (selfAbsorptionScore / 2) * 20;
+                
+                // 일반적 자기 초점적 주의 점수 (11번 문항)
+                const q11Radio = document.querySelector('input[name="q11"]:checked');
+                const generalSelfFocusScore = q11Radio ? parseInt(q11Radio.value) * 20 : 0;
+                
+                // 몰입 점수 (12-15번 문항)
+                let flowScore = 0;
+                for (let i = 12; i <= 15; i++) {
+                    const radioChecked = document.querySelector(`input[name="q${i}"]:checked`);
+                    if (radioChecked) {
+                        const value = parseInt(radioChecked.value);
+                        flowScore += value;
+                    }
+                }
+                flowScore = (flowScore / 4) * 20;
+                
+                // 자기 수용 점수 (16-17번 문항)
+                let selfAcceptanceScore = 0;
+                for (let i = 16; i <= 17; i++) {
+                    const radioChecked = document.querySelector(`input[name="q${i}"]:checked`);
+                    if (radioChecked) {
+                        const value = parseInt(radioChecked.value);
+                        selfAcceptanceScore += value;
+                    }
+                }
+                selfAcceptanceScore = (selfAcceptanceScore / 2) * 20;
+                
+                // 결과 표시
+                document.getElementById('anxiety-progress').style.width = `${anxietyScore}%`;
+                document.getElementById('anxiety-progress').textContent = `${Math.round(anxietyScore)}%`;
+                
+                let anxietyLevel = '';
+                if (anxietyScore < 30) {
+                    anxietyLevel = '낮음';
+                } else if (anxietyScore < 60) {
+                    anxietyLevel = '보통';
+                } else {
+                    anxietyLevel = '높음';
+                }
+                
+                document.getElementById('anxiety-level').innerHTML = `
+                    <h3>발표 불안 수준: ${anxietyLevel}</h3>
+                    <p>당신의 발표 불안 점수는 100점 만점에 ${Math.round(anxietyScore)}점입니다.</p>
+                    
+                    <div class="result-section">
+                        <h3>자기 몰입 정도: ${Math.round(selfAbsorptionScore)}%</h3>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${selfAbsorptionScore}%">${Math.round(selfAbsorptionScore)}%</div>
+                        </div>
+                        <p>${selfAbsorptionScore > 60 ? '자신의 모습, 행동, 감정에 지나치게 집중하는 경향이 높습니다.' : '자신에게 과도하게 집중하는 경향이 높지 않습니다.'}</p>
+                    </div>
+                    
+                    <div class="result-section">
+                        <h3>일반적 자기 초점적 주의: ${Math.round(generalSelfFocusScore)}%</h3>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${generalSelfFocusScore}%">${Math.round(generalSelfFocusScore)}%</div>
+                        </div>
+                        <p>${generalSelfFocusScore > 60 ? '자신에게 주의를 기울이되 유연하게 대처하는 능력이 높습니다.' : '자신의 상태를 객관적으로 파악하는 능력을 향상시킬 필요가 있습니다.'}</p>
+                    </div>
+                    
+                    <div class="result-section">
+                        <h3>몰입 경험: ${Math.round(flowScore)}%</h3>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${flowScore}%">${Math.round(flowScore)}%</div>
+                        </div>
+                        <p>${flowScore > 60 ? '발표 상황에 잘 몰입하는 편입니다.' : '발표 상황에 몰입하는 경험이 부족합니다.'}</p>
+                    </div>
+                    
+                    <div class="result-section">
+                        <h3>자기 수용: ${Math.round(selfAcceptanceScore)}%</h3>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${selfAcceptanceScore}%">${Math.round(selfAcceptanceScore)}%</div>
+                        </div>
+                        <p>${selfAcceptanceScore > 60 ? '자신을 있는 그대로 수용하는 능력이 높습니다.' : '자신을 있는 그대로 수용하는 능력을 향상시킬 필요가 있습니다.'}</p>
+                    </div>
+                    
+                    <div class="recommendation">
+                        <h3>개선 방안</h3>
+                        <ul>
+                            ${anxietyScore > 60 ? '<li>심호흡과 이완 기법을 발표 전에 연습해보세요.</li>' : ''}
+                            ${selfAbsorptionScore > 60 ? '<li>자신보다 청중과 발표 내용에 더 집중하는 연습을 해보세요.</li>' : ''}
+                            ${generalSelfFocusScore < 40 ? '<li>자신의 상태를 객관적으로 관찰하는 마음챙김 연습이 도움이 될 수 있습니다.</li>' : ''}
+                            ${flowScore < 40 ? '<li>발표 전 충분한 준비와 명확한 목표 설정이 몰입 경험을 높이는 데 도움이 됩니다.</li>' : ''}
+                            ${selfAcceptanceScore < 40 ? '<li>실수를 하더라도 자신의 가치는 변하지 않는다는 믿음을 키워보세요.</li>' : ''}
+                            <li>발표 기회를 자주 가지며 점진적으로 경험을 쌓는 것이 불안 감소에 도움이 됩니다.</li>
+                        </ul>
+                    </div>
+                `;
+                
+                // 결과 페이지 표시
+                document.getElementById('survey').style.display = 'none';
+                document.getElementById('results').style.display = 'block';
+            }
+            
+            // 마지막 페이지에서 결과 확인하기 버튼 추가
+            const page5 = document.getElementById('page5');
+            const navButtons = page5.querySelector('.nav-buttons');
+            
+            const submitButton = document.createElement('button');
+            submitButton.textContent = '결과 확인하기';
+            submitButton.classList.add('next');
+            submitButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (validateCurrentPage(5)) {
+                    calculateResults();
+                }
+            });
+            
+            navButtons.appendChild(submitButton);
+            
+            // 처음부터 다시하기 버튼 추가
+            const retryButton = document.createElement('button');
+            retryButton.id = 'retry-btn';
+            retryButton.textContent = '다시 테스트하기';
+            retryButton.addEventListener('click', function() {
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('survey').style.display = 'block';
+                document.getElementById('anxietyForm').reset();
+                showPage(1);
+            });
+            
+            document.getElementById('results').appendChild(retryButton);
+        });
+        </script>
