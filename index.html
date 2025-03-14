@@ -861,7 +861,7 @@
                         anxietyScore += value;
                     }
                 }
-                anxietyScore = (anxietyScore / 8) * 20; // 백분율로 변환 (100점 만점)
+                anxietyScore = (anxietyScore / 8) * 20; // 백분율 변환 (100점 만점)
                 
                 // 자기 몰입 점수 (9-10번 문항)
                 let selfAbsorptionScore = 0;
@@ -905,9 +905,9 @@
                 document.getElementById('anxiety-progress').textContent = `${Math.round(anxietyScore)}%`;
                 
                 let anxietyLevel = '';
-                if (anxietyScore < 30) {
+                if (anxietyScore < 40) {
                     anxietyLevel = '낮음';
-                } else if (anxietyScore < 60) {
+                } else if (anxietyScore < 70) {
                     anxietyLevel = '보통';
                 } else {
                     anxietyLevel = '높음';
